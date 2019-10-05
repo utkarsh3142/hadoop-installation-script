@@ -279,10 +279,13 @@ out "INFO - Replaced hdfs-site.xml file"
 
 # Start Hadoop daemons if flag is set.
 if [ $RUN_HADOOP_DAEMONS -eq 1 ] && [ $PASSWORDLESS_SSH_FLAG -eq 1 ]; then 
-	out "INFO - Starting Hadoop daemons."
+	
 	export PATH=$JAVA_HOME_DIR/bin:$PATH;
 	export PATH=$HADOOP_HOME/bin:$PATH;
-	su -c  "$HADOOP_HOME_DIR/bin/hdfs namenode -format" - $USER_NAME  >> $OUT_FILE
+	out "INFO - Formatting namenode."
+	su -c  "$HADOOP_HOME_DIR/bin/hdfs namenode -format  > ~/namenode_format.out 2>&1" - $USER_NAME
+	out "INFO - Formatting namenode complete."
+	out "INFO - Starting Hadoop daemons."
 	command="su - $USER_NAME $HADOOP_HOME_DIR/sbin/start-dfs.sh"
 	if $command >> $OUT_FILE; then
 		out "INFO - Hadoop daemons started."
