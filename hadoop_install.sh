@@ -191,6 +191,7 @@ if test -f "$PUBLIC_KEY_FILE"; then
 else
 	out "INFO - Creating private and public keys"
 	su -c 'cat /dev/zero | ssh-keygen -q -N ""' - $USER_NAME
+	echo ""
 	if [ $? -eq 0 ]; then
 		PUBLIC_KEY_CONTENT=$(cat $PUBLIC_KEY_FILE)
 		echo $PUBLIC_KEY_CONTENT >> $AUTHORIZED_KEY_FILE
@@ -281,14 +282,8 @@ if [ $RUN_HADOOP_DAEMONS -eq 1 ] && [ $PASSWORDLESS_SSH_FLAG -eq 1 ]; then
 	out "INFO - Starting Hadoop daemons."
 	export PATH=$JAVA_HOME_DIR/bin:$PATH;
 	export PATH=$HADOOP_HOME/bin:$PATH;
-	command="su - $USER_NAME $HADOOP_HOME_DIR/bin/hdfs namenode -format"
-	if $command >> $OUT_FILE; then
-		out "INFO - Namenode format complete."
-	else
-		out "WARN - Error formatting namenode."
-	fi
+	su -c  "$HADOOP_HOME_DIR/bin/hdfs namenode -format" - $USER_NAME  >> $OUT_FILE
 	command="su - $USER_NAME $HADOOP_HOME_DIR/sbin/start-dfs.sh"
-	out "INFO - COMMAND - $command"
 	if $command >> $OUT_FILE; then
 		out "INFO - Hadoop daemons started."
 	else
